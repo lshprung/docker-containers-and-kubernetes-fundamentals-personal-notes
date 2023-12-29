@@ -95,7 +95,7 @@
 
 ### Running a container
 
-```
+```sh
 # pull and run an nginx server
 # `--publish 80:80` maps the host port to the container listening port
 # `--name webserver` container local name
@@ -121,7 +121,7 @@ FROM nginx:alpine
 COPY . /usr/share/nginx/html
 ```
 
-```
+```sh
 # build
 docker build -t webserver-image:v1 .
 
@@ -154,7 +154,7 @@ ENTRYPOINT ["node", "./app.js"]
 
 ### Mapping a Volume
 
-```
+```sh
 # create a volume
 docker volume create myvol
 
@@ -171,7 +171,7 @@ docker run -d --name devtest -v myvol:/app nginx:latest
 
 #### Mapping to a local folder
 
-```
+```sh
 # run a container with a volume
 # `d:/test` specify a folder
 docker run -d --name devtest -v d:/test:/app nginx:latest
@@ -218,7 +218,7 @@ services:
 
 ### Docker Compose Example
 
-```
+```sh
 # build the service
 docker compose build
 
