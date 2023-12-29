@@ -1,0 +1,11 @@
+Build Instructions:
+
+Simply run make in the current directory. Supported build targets include:
+
+|make all         |Build HTML pages from Markdown sources (this is the default)      |
+|make bdist       |Build a distributable .tar.gz containing the HTML sources in dist/|
+|make sdist       |Build a distributable .tar.gz containing the Markdown sources     |
+|make clean       |Remove HTML output                                                |
+|make dist-clean  |Remove HTML output and dist/ directory                            |
+
+By default, marked.js is used to compile Markdown files to HTML. To specify a different Markdown compiler, set the MARKC variable, e.g. `make MARKC=markdown`. Use at your own discretion, as results may vary, and only marked.js has been thoroughly tested to work correctly
