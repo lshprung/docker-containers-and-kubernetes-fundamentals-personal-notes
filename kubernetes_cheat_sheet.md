@@ -22,6 +22,13 @@
 |`kubectl delete ns`                   |Delete a namespace           |
 |`kubectl get pods --all-namespaces`   |List all pods in all namespaces|
 
+### Nodes
+
+|                                      |                             |
+|--------------------------------------|-----------------------------|
+|`kubectl get nodes`                   |Get a list of all the installed nodes|
+|`kubectl describe node [NAME]`        |Get some info about a node   |        
+
 ### Misc.
 
 |                                      |                             |
