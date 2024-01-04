@@ -40,8 +40,10 @@
 |`kubectl describe pod [podname]`      |Show pod info                |
 |`kubectl get pod [podname] -o yaml > file.yaml`|Extract the pod definition in YAML and save it to a file|
 |`kubectl exec -it [podname] -- sh`    |Interactive mode             |
+|`kubectl exec -it [podname] -c [containername] -- sh`|Exec into a pod|
 |`kubectl delete -f [pod-definition.yml]`|Delete a pod               |
 |`kubectl delete pod [podname]`        |Same using the pod's name    |
+|`kubectl logs [podname] -c [containername]`|Get the logs for a container|
 
 ### Misc.
 
@@ -222,4 +224,33 @@ spec:
   - name: init-mydb
     image: busybox:1.28
     command: ['sh', '-c', "until lookup mydb.namespace.svc.cluster.local; do echo waiting for mydb; sleep 2; done"]
+```
+
+---
+
+### Multi-Containers Pods
+
+Example of defining multiple containers in a single pod definition
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: two-containers
+spec:
+  restartPolicy: Always
+  containers:
+  # Container #1
+  - name: mynginx
+    image: nginx
+    ports:
+      - containerPort: 80
+  # Container #2
+  - name: mybox
+    image: busybox
+    ports:
+      - containerPort: 81
+    command:
+      - sleep
+      - "3600"
 ```
