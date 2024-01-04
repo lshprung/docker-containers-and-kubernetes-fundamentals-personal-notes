@@ -29,6 +29,20 @@
 |`kubectl get nodes`                   |Get a list of all the installed nodes|
 |`kubectl describe node [NAME]`        |Get some info about a node   |        
 
+### Pod
+
+|                                      |                             |
+|--------------------------------------|-----------------------------|
+|`kubectl create -f [pod-definition.yml]`|Create a pod               |
+|`kubectl run [podname] --image=busybox -- /bin/sh -c "sleep 3600"`|Run a pod (example)| 
+|`kubectl get pods`                    |List the running pods        |
+|`kubectl get pods -o wide`            |Same but with more info      |
+|`kubectl describe pod [podname]`      |Show pod info                |
+|`kubectl get pod [podname] -o yaml > file.yaml`|Extract the pod definition in YAML and save it to a file|
+|`kubectl exec -it [podname] -- sh`    |Interactive mode             |
+|`kubectl delete -f [pod-definition.yml]`|Delete a pod               |
+|`kubectl delete pod [podname]`        |Same using the pod's name    |
+
 ### Misc.
 
 |                                      |                             |
@@ -105,14 +119,31 @@ Pod definition:
 
 ```yaml
 apiVersion: v1
+# Object type
 kind: Pod
 metadata:
   name: myapp-pod
   namespace: prod
+  # Labels are used to identify, describe and group related sets of objects or resources together
+  labels:
+    app: myapp
+    type: front-end
 spec:
   containers:
-    - name: nginx-container
-    - image: nginx
+  - name: nginx-container
+    image: nginx
+    ports:
+      # Listening port
+    - containerPort: 80
+      name: http
+      protocol: TCP
+    # Environment Variables
+    env:
+    - name: DBCON
+      value: connectionstring
+    # Equiv to Docker ENTRYPOINT
+    command: ["/bin/sh", "-c"]
+    args: ["echo ${DBCON}"]
 ```
 
 ---
@@ -148,4 +179,47 @@ spec:
     pods: "10"
     limits.cpu: "5"
     limits.memory: 10Gi
+```
+
+#### Pod definition
+
+---
+
+### Pod state
+
+|                              |                                        |
+|------------------------------|----------------------------------------|
+|Pending                       |Accepted but not yet created            |
+|Running                       |Bound to a node                         |
+|Succeeded                     |Exited with status 0                    |
+|Failed                        |All containers exit and at least one exited with non-zero status|
+|Unknown                       |Communication issues with the pod       |
+|CrashLoopBackOff              |Started crashed, started again, and then crashed again|
+
+---
+
+### Init Containers
+
+Example pod definition that uses init containers
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+spec:
+  # App container
+  containers:
+  - name: myapp-container
+    image: busybox
+  # Init containers (these will run before the app container)
+  initContainers:
+  - name: init-myservice
+    image: busybox:1.28
+    command: ['sh', '-c', "until nslookup mysvc.namespace.svc.cluster.local; do echo waiting for my service; sleep 2; done"]
+  - name: init-mydb
+    image: busybox:1.28
+    command: ['sh', '-c', "until lookup mydb.namespace.svc.cluster.local; do echo waiting for mydb; sleep 2; done"]
 ```
