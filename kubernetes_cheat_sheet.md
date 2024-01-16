@@ -45,6 +45,70 @@
 |`kubectl delete pod [podname]`        |Same using the pod's name    |
 |`kubectl logs [podname] -c [containername]`|Get the logs for a container|
 
+### ReplicaSets
+
+|                                      |                             |
+|--------------------------------------|-----------------------------|
+|`kubectl apply -f [definition.yaml]`  |Create a ReplicaSet          |
+|`kubectl get rs`                      |List ReplicaSets             |
+|`kubectl describe rs [rsName]`        |Get info                     |
+|`kubectl delete -f [definition.yaml]` |Delete a ReplicaSet          |
+|`kubectl delete rs [rsName]`          |Same but using the ReplicaSet name|
+
+### Deployments
+
+|                                      |                             |
+|--------------------------------------|-----------------------------|
+|`kubectl create deploy [deploymentName] --image=busybox --replicas=3 --port=80`|The imperative way|
+|`kubectl apply -f [definition.yaml]`  |Create a deployment          |
+|`kubectl get deploy`                  |List deployments             |
+|`kubectl describe deploy [deploymentName]`|Get info                 |
+|`kubectl get rs`                      |List replicasets             |
+|`kubectl delete -f [definition.yaml]` |Delete a deployment          |
+|`kubectl delete deploy [deploymentName]`|Same but using the deployment name|
+
+### DaemonSets
+
+|                                      |                             |
+|--------------------------------------|-----------------------------|
+|`kubectl apply -f [definition.yaml]`  |Create a DaemonSet           |
+|`kubectl get ds`                      |List DaemonSets              |
+|`kubectl describe ds [rsName]`        |Get info                     |
+|`kubectl delete -f [definition.yaml]` |Delete a DaemonSet           |
+|`kubectl delete ds [rsName]`          |Same but using the DaemonSet name|
+
+### StatefulSets
+
+|                                      |                             |
+|--------------------------------------|-----------------------------|
+|`kubectl apply -f [definition.yaml]`  |Create a StatefulSet         |
+|`kubectl get sts`                     |List StatefulSets            |
+|`kubectl describe sts [rsName]`       |Get info                     |
+|`kubectl delete -f [definition.yaml]` |Delete a StatefulSet         |
+|`kubectl delete sts [rsName]`         |Same but using the StatefulSet name|
+
+### Jobs
+
+|                                      |                             |
+|--------------------------------------|-----------------------------|
+|`kubectl create job [jobName] --image=busybox`|The imperative way   |
+|`kubectl apply -f [definition.yaml]`  |Create a Job                 |
+|`kubectl get job`                     |List jobs                    |
+|`kubectl describe job [jobName]`      |Get info                     |
+|`kubectl delete -f [definition.yaml]` |Delete a job                 |
+|`kubectl delete job [jobName]`        |Same but using the Job name  |
+
+### CronJobs
+
+|                                      |                             |
+|--------------------------------------|-----------------------------|
+|`kubectl create cronjob [jobName] --image=busybox --schedule="*/1 * * * *" -- bin/sh -c "date;"`|The imperative way|
+|`kubectl apply -f [definition.yaml]`  |Create a CronJob             |
+|`kubectl get cj`                      |List CronJobs                |
+|`kubectl describe cj [jobName]`       |Get info                     |
+|`kubectl delete -f [definition.yaml]` |Delete a CronJob             |
+|`kubectl delete cj [jobName]`         |Same but using the CronJob name|
+
 ### Misc.
 
 |                                      |                             |
@@ -253,4 +317,157 @@ spec:
     command:
       - sleep
       - "3600"
+```
+
+---
+
+### ReplicaSets
+
+Example ReplicaSet definition
+
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: rs-example
+spec:
+  replicas: 3 # desired number of instances
+  selector:
+    matchLabels:
+      app: nginx
+      env: front-end
+  template:
+    metadata:
+      labels:
+        app: nginx
+        type: front-end
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:stable-alpine
+        ports:
+        - containerPort: 80
+```
+
+- Top section is specific to ReplicaSets
+- Section under `template:` specifies the pods you want to run
+
+---
+
+### Deployments
+
+Example Deployment definition
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-example
+spec:
+  replicas: 3 # number of pod instances
+  revisionHistoryLimit: 3 # number of previous iterations to keep
+  selector:
+    matchLabels:
+      app: nginx
+      env: prod
+  strategy:
+    # Possible strategies are RollingUpdate and Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+        type: prod
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:stable-alpine
+        ports:
+        - containerPort: 80
+```
+
+- Like with ReplicaSets, the section under `template:` specifies the pods you want to run
+
+---
+
+### DaemonSet
+
+Example DaemonSet definition
+
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: daemonset-example
+  labels:
+    app: daemonset-example
+spec:
+  selector:
+    matchLabels:
+      app: daemonset-example
+  template:
+    metadata:
+      labels:
+        app: daemonset-example
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      containers:
+      - name: busybox
+        image: busybox
+        args:
+        - sleep
+        - "10000"
+```
+
+---
+
+### Job
+
+Example Job definition
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pi
+spec:
+  activeDeadlineSeconds 30 # Max seconds to run
+  parallelism: 3 # How many pods should run in parallel
+  completions: 3 # How many successful pod completions are needed to mark a job completed
+  template:
+    spec:
+      containers:
+      - name: pi
+        image: perl
+        command: ["perl", "-Mbignum=bpi", "-wle", "print bpi(2000)"]
+      restartPolicy: Never # Default is Always
+```
+
+---
+
+### CronJob
+
+Example CronJob definition
+
+```yaml
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: hello-cron
+spec:
+  schedule: "* * * * *" # Cron format string
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: busybox
+            image: busybox
+            command: ["echo", "Hello from the CronJob"]
+          restartPolicy: Never
 ```
