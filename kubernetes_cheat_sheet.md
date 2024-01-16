@@ -109,6 +109,16 @@
 |`kubectl delete -f [definition.yaml]` |Delete a CronJob             |
 |`kubectl delete cj [jobName]`         |Same but using the CronJob name|
 
+### RollingUpdate
+
+|                                      |                             |
+|--------------------------------------|-----------------------------|
+|`kubectl apply -f [definition.yaml]`  |Update a deployment          |
+|`kubectl rollout status`              |Get the progress of the update|
+|`kubectl rollout history deployment [deploymentname]`|Get the history of the deployment|
+|`kubectl rollout undo [deploymentname]`|Rollback a deployment       |
+|`kubectl rollout undo [deploymentname] --to-revision=[revision#]`|Rollback to a revision number|
+
 ### Misc.
 
 |                                      |                             |
