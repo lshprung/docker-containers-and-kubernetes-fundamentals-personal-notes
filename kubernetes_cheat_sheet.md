@@ -119,6 +119,32 @@
 |`kubectl rollout undo [deploymentname]`|Rollback a deployment       |
 |`kubectl rollout undo [deploymentname] --to-revision=[revision#]`|Rollback to a revision number|
 
+### ClusterIP
+
+|                                      |                             |
+|--------------------------------------|-----------------------------|
+|`kubectl expose po [podName] --port=80 --target-port=8080 --name=frontend|Create a service to expose a pod|
+|`kubectl expose deploy [deployName] --port=80 --target-port=8080`|Create a service to expose a deployment|
+|`kubectl apply -f [definition.yaml]`  |Deploy the service           |
+|`kubectl get svc`                     |Get the services list        |
+|`kubectl get svc -o wide`             |Get extra info               |
+|`kubectl describe svc [serviceName]`  |Describe the service         |
+|`kubectl delete -f [definition.yaml]` |Delete the service           |
+|`kubectl delete svc [serviceName]`    |Delete the service using it's name|
+
+### NodePort
+
+|                                      |                             |
+|--------------------------------------|-----------------------------|
+|`kubectl expose po [podName] --port=80 --target-port=8080 --type=NodePort`|Create a service to expose a pod|
+|`kubectl expose deploy [deployName] --port=80 --target-port=8080 --type=NodePort --name=frontend`|Create a service to expose a deployment|
+|`kubectl apply -f [definition.yaml]`  |Deploy the service           |
+|`kubectl get svc`                     |Get the services list        |
+|`kubectl get svc -o wide`             |Get extra info               |
+|`kubectl describe svc [serviceName]`  |Describe the service         |
+|`kubectl delete -f [definition.yaml]` |Delete the service           |
+|`kubectl delete svc [serviceName]`    |Delete the service using it's name|
+
 ### Misc.
 
 |                                      |                             |
